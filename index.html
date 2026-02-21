@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<title>Periodic Table</title>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+ h1{
+  margin:15px 0;
+  font-size:72px;
+  color:#2c3e50;
+  text-shadow:1px 1px 2px rgba(0,0,0,0.1);
+}
+
+.el .sym{
+  font-weight:600;
+}
+
+.el .name{
+  font-weight:300;
+}
+
+body{
+  font-family: 'Prompt', sans-serif;
+  background: linear-gradient(135deg,#f5f7fa,#e4ecf5);
+  text-align:center;
+  margin:0;
+  padding-bottom:40px;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+.periodic{
+  background:#ffffffcc;
+  padding:15px;
+  border-radius:15px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.1);
+
+  max-width:100%;
+  overflow-x:auto;   /* ถ้าจอเล็ก ให้เลื่อนแทน */
+}
+h1{margin:10px}
+.periodic{
+  display:grid;
+  grid-template-columns:40px repeat(18,80px);
+  gap:6px;
+}
+
+.el{
+  border:1px solid #333;
+  height:95px;
+  padding:3px;
+  box-sizing:border-box;
+  font-size:10px;
+  cursor:pointer;
+  border-radius:8px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.el:hover{
+  transform: scale(1.08);
+  box-shadow:0 6px 12px rgba(0,0,0,0.3);
+  z-index:5;
+}
+.el{
+  cursor:pointer;
+}
+.no{font-size:10px;text-align:left}
+.sym{font-size:22px;font-weight:bold}
+.w{font-size:10px}
+.name{font-size:10px}
+
+.alkali{background:#ffb3b3}
+.alkaline{background:#ffd9b3}
+.transition{background:#ffffb3}
+.metalloid{background:#ccffcc}
+.nonmetal{background:#b3e5ff}
+.halogen{background:#b3ffff}
+.noble{background:#e1bee7}
+.lanth{background:#f8bbd0}
+.actin{background:#d1c4e9}
+.post-transition{background:#e2e2e2;}
+.label{
+  grid-column:1 / span 18;
+  text-align:left;
+  font-weight:bold;
+  margin-top:8px;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content{
+  background: linear-gradient(135deg,#ffffff,#f0f4ff);
+  padding: 20px;
+  width: 320px;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow:0 15px 30px rgba(0,0,0,0.3);
+  animation: pop 0.25s ease;
+}
+@keyframes pop{
+  from{
+    transform: scale(0.7);
+    opacity:0;
+  }
+  to{
+    transform: scale(1);
+    opacity:1;
+  }
+}
+.close{
+  cursor:pointer;
+  color:#e74c3c;
+  font-size:20px;
+}
+
+
+.close {
+  cursor: pointer;
+  color: red;
+  font-weight: bold;
+  float: right;
+}
+
+@keyframes pop{
+  from{
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to{
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.modal-content{
+  background: linear-gradient(135deg,#ffffff,#f2f2f2);
+  padding: 25px;
+  width: 320px;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  animation: pop 0.3s ease;
+}
+
+.modal-content.alkali{background:#ffebee}
+.modal-content.alkaline{background:#fff3e0}
+.modal-content.transition{background:#fffde7}
+.modal-content.metalloid{background:#e8f5e9}
+.modal-content.nonmetal{background:#e3f2fd}
+.modal-content.halogen{background:#e0f7fa}
+.modal-content.noble{background:#f3e5f5}
+.modal-content.lanth{background:#fce4ec}
+.modal-content.actin{background:#ede7f6}
+.modal-content.actin{background:#e2e2e2}
+.modal-content p{
+  text-align:left;
+  margin:6px 0;
+  font-size:14px;
+}
+
+.modal-content h2{
+  margin-top:0;
+  font-size:26px;
+}
+
+.close{
+  float:right;
+  font-size:18px;
+  padding:5px 8px;
+  border-radius:50%;
+}
+.close:hover{
+  background:#eee;
+}
+
+.atom{
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin: 10px auto;
+}
+
+.nucleus{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 28px;
+  height: 28px;
+  background: #e53935;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.orbit{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border: 1px dashed #555;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.electron{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  background: #1e88e5;
+  border-radius: 50%;
+}
+
+.legend{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px,1fr));
+  gap: 8px;
+  max-width: 900px;
+  margin: 15px auto;
+  font-size: 13px;
+}
+
+.legend-item{
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-color{
+  width: 20px;
+  height: 20px;
+  border: 1px solid #333;
+}
+
+
+.lg-alkali{background:#ffb3b3}
+.lg-alkaline{background:#ffd9b3}
+.lg-transition{background:#ffffb3}
+.lg-metalloid{background:#ccffcc}
+.lg-nonmetal{background:#b3e5ff}
+.lg-halogen{background:#b3ffff}
+.lg-noble{background:#e1bee7}
+.lg-lanth{background:#f8bbd0}
+.lg-actin{background:#d1c4e9}
+.lg-post-transition{background:#e2e2e2 ;}
+.periodic{
+  background:#ffffffcc;
+  padding:15px;
+  border-radius:15px;
+  box-shadow:0 10px 25px rgba(0,0,0,0.1);
+}
+.group-header,
+.period-header{
+  background:transparent;
+  border:none;
+  box-shadow:none;
+  font-weight:600;
+  color:#444;
+}
+.group-header,
+.period-header{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+}
+
+.period-header{
+  background:#dfe6e9;
+  font-weight:bold;
+}
+
+.group-header{
+  background:#b2bec3;
+  font-weight:bold;
+}
+.group-header,
+.period-header{
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+#quiz-buttons{
+  margin-top:30px;
+  display:flex;
+  justify-content:center;
+  gap:20px;
+}
+
+#quiz-buttons button{
+  padding:12px 20px;
+  font-size:16px;
+  font-weight:bold;
+  border-radius:12px;
+  border:none;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+#quiz-buttons button:hover{
+  transform:scale(1.05);
+}
+
+
+#quiz-buttons button:nth-child(1){
+  background:#55efc4;
+}
+
+#quiz-buttons button:nth-child(2){
+  background:#ffeaa7;
+}
+
+#quiz-buttons button:nth-child(3){
+  background:#fab1a0;
+}
+#quiz-buttons button{
+  padding:20px 32px;    
+  font-size:20px;       
+  font-weight:bold;
+  border-radius:18px;   
+  border:none;
+  cursor:pointer;
+  transition:0.2s;
+  min-width:220px;      
+}
+#quiz-buttons button{
+  box-shadow:0 6px 0 rgba(0,0,0,0.2);
+}
+
+#quiz-buttons button:active{
+  transform:translateY(4px);
+  box-shadow:0 2px 0 rgba(0,0,0,0.2);
+}
+.element-guide{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:40px;
+  margin:25px 0;
+}
+
+.guide-box{
+  width:100px;
+  height:110px;
+  border:2px solid #333;
+  border-radius:12px;
+  background:#e2e2e2; /* ตรงกับ post-transition metal (Sn) */
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  padding:6px;
+  font-size:12px;
+  box-shadow:0 6px 12px rgba(0,0,0,0.2);
+}
+
+.guide-box .sym{
+  font-size:26px;
+  font-weight:bold;
+  text-align:center;
+}
+
+.guide-box .name{
+  font-size:11px;
+  text-align:center;
+}
+
+.guide-text{
+  text-align:left;
+  font-size:14px;
+  line-height:1.6;
+}
+/* ====== Element Guide Section ====== */
+
+.element-guide{
+  width:100%;
+  max-width:900px;
+  margin:30px auto;
+  padding:25px;
+  background:linear-gradient(135deg,#ffffff,#f4f7ff);
+  border-radius:20px;
+  box-shadow:0 15px 35px rgba(0,0,0,0.1);
+}
+
+.guide-title{
+  margin-top:0;
+  margin-bottom:20px;
+  font-size:24px;
+  color:#2c3e50;
+}
+
+.guide-container{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:60px;
+  flex-wrap:wrap;
+}
+
+/* กล่องตัวอย่างธาตุ */
+.guide-box{
+  width:120px;
+  height:130px;
+  border-radius:15px;
+  padding:8px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  font-size:13px;
+  position:relative;
+  transition:0.3s;
+}
+
+.guide-box:hover{
+  transform:translateY(-8px);
+  box-shadow:0 15px 25px rgba(0,0,0,0.25);
+}
+
+.guide-box .sym{
+  font-size:32px;
+  font-weight:bold;
+  text-align:center;
+}
+
+.guide-box .name{
+  font-size:12px;
+  text-align:center;
+}
+
+/* คำอธิบายด้านขวา */
+.guide-text{
+  text-align:left;
+  font-size:15px;
+  line-height:2;
+}
+
+.guide-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:8px;
+}
+
+/* จุดนำหน้าข้อความ */
+.dot{
+  width:10px;
+  height:10px;
+  background:#636e72;
+  border-radius:50%;
+}
+/* ===== Element Guide Advanced ===== */
+
+.element-guide{
+  max-width:700px;
+  margin:40px auto;
+  padding:30px;
+  background:linear-gradient(135deg,#ffffff,#eef3ff);
+  border-radius:20px;
+  box-shadow:0 15px 35px rgba(0,0,0,0.1);
+}
+
+.guide-title{
+  margin-top:0;
+  margin-bottom:30px;
+  font-size:24px;
+  color:#2c3e50;
+}
+
+.guide-wrapper{
+  position:relative;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+/* กล่องตัวอย่าง */
+.guide-box{
+  width:130px;
+  height:150px;
+  border-radius:15px;
+  padding:10px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  font-size:14px;
+  position:relative;
+  box-shadow:0 10px 20px rgba(0,0,0,0.2);
+}
+
+.guide-box .sym{
+  font-size:36px;
+  font-weight:bold;
+  text-align:center;
+}
+
+.guide-box .name{
+  font-size:13px;
+  text-align:center;
+}
+
+/* กล่องข้อความลูกศร */
+.guide-arrows{
+  position:absolute;
+  left:200px;
+  top:0;
+  width:300px;
+}
+
+/* ลูกศรแต่ละอัน */
+.arrow{
+  position:absolute;
+  background:#2d3436;
+  color:white;
+  padding:6px 12px;
+  border-radius:20px;
+  font-size:14px;
+}
+
+/* เส้นลูกศร */
+.arrow::after{
+  content:"";
+  position:absolute;
+  left:-40px;
+  top:50%;
+  width:40px;
+  height:2px;
+  background:#2d3436;
+}
+
+.arrow::before{
+  content:"";
+  position:absolute;
+  left:-8px;
+  top:50%;
+  transform:translateY(-50%);
+  border-top:6px solid transparent;
+  border-bottom:6px solid transparent;
+  border-right:8px solid #2d3436;
+}
+
+/* จัดตำแหน่งให้ตรง */
+.a1{ top:5px; }
+.a2{ top:45px; }
+.a3{ top:90px; }
+.a4{ top:125px; }
+</style>
+</head>
+
+<body>
+<h1>Periodic Table</h1>
+<div class="element-guide">
+
+  <h2 class="guide-title">โครงสร้างของช่องธาตุ</h2>
+
+  <div class="guide-wrapper">
+
+    <div class="guide-box post-transition">
+      <div class="no" id="g-no">1</div>
+      <div class="sym" id="g-sym">H</div>
+      <div class="w" id="g-w">1.008</div>
+      <div class="name" id="g-name">Hydrogen</div>
+    </div>
+
+    <div class="guide-arrows">
+      <div class="arrow a1">เลขอะตอม</div>
+      <div class="arrow a2">สัญลักษณ์ธาตุ</div>
+      <div class="arrow a3">มวลอะตอม</div>
+      <div class="arrow a4">ชื่อธาตุ</div>
+    </div>
+
+  </div>
+
+</div>
+<div class="legend">
+  <div class="legend-item">
+    <div class="legend-color lg-alkali"></div>
+    Alkali metal
+  </div>
+  <div class="legend-item">
+    <div class="legend-color lg-alkaline"></div>
+    Alkaline earth metal
+  </div>
+  <div class="legend-item">
+    <div class="legend-color lg-transition"></div>
+    Transition metal
+  </div>
+   <div class="legend-item">
+    <div class="legend-color lg-post-transition"></div>
+    post-transition metal
+  </div>
+  <div class="legend-item">
+    <div class="legend-color lg-metalloid"></div>
+    Metalloid
+  </div>
+  <div class="legend-item">
+    <div class="legend-color lg-nonmetal"></div>
+    Non-metal
+  </div>
+  <div class="legend-item">
+    <div class="legend-color lg-halogen"></div>
+    Halogen
+  </div>
+  <div class="legend-item">
+    <div class="legend-color lg-noble"></div>
+    Noble gas
+  </div>
+  <div class="legend-item">
+    <div class="legend-color lg-lanth"></div>
+    Lanthanide
+  </div>
+  <div class="legend-item">
+    <div class="legend-color lg-actin"></div>
+    Actinide
+  </div>
+</div>
+
+<div class="periodic" id="table"></div>
+<div id="quiz-buttons">
+  <button id="beforeBtn" onclick="goQuiz(1)">
+   quiz
+  </button>
+
+
+<script src="js/main.js"></script>
+
+
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeModal()">✖</span>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+const E = [
+{n:1,s:"H",nm:"Hydrogen",w:"1.008",c:1,r:1,g:"nonmetal",ox:"+1, −1",elec:"1s¹"},
+{n:2,s:"He",nm:"Helium",w:"4.0026",c:18,r:1,g:"noble",ox:"0",elec:"1s²"},
+{n:3,s:"Li",nm:"Lithium",w:"7",c:1,r:2,g:"alkali",ox:"+1",elec:"[He] 2s¹"},
+{n:4,s:"Be",nm:"Beryllium",w:"9.012183",c:2,r:2,g:"alkaline",ox:"+2",elec:"[He] 2s²"},
+{n:5,s:"B",nm:"Boron",w:"10.81",c:13,r:2,g:"metalloid",ox:"+3",elec:"[He] 2s² 2p¹"},
+{n:6,s:"C",nm:"Carbon",w:"12.011",c:14,r:2,g:"nonmetal",ox:"−4, +2, +4",elec:"[He] 2s² 2p²"},
+{n:7,s:"N",nm:"Nitrogen",w:"14.007",c:15,r:2,g:"nonmetal",ox:"+5, +4, +3",elec:"[He] 2s² 2p³"},
+{n:8,s:"O",nm:"Oxygen",w:"15.999",c:16,r:2,g:"nonmetal",ox:"−2",elec:"[He] 2s² 2p⁴"},
+{n:9,s:"F",nm:"Fluorine",w:"18.9984",c:17,r:2,g:"halogen",ox:"−1",elec:"[He] 2s² 2p⁵"},
+{n:10,s:"Ne",nm:"Neon",w:"20.18",c:18,r:2,g:"noble",ox:"0",elec:"[He] 2s² 2p⁶"},
+{n:11,s:"Na",nm:"Sodium",w:"22.98977",c:1,r:3,g:"alkali",ox:"+1",elec:"[Ne] 3s¹"},
+{n:12,s:"Mg",nm:"Magnesium",w:"24.305",c:2,r:3,g:"alkaline",ox:"+2",elec:"[Ne] 3s²"},
+{n:13,s:"Al",nm:"Aluminium",w:"26.98154",c:13,r:3,g:"post-transition",ox:"+3",elec:"[Ne] 3s² 3p¹"},
+{n:14,s:"Si",nm:"Silicon",w:"28.085",c:14,r:3,g:"metalloid",ox:"−4,+2,+4",elec:"[Ne] 3s² 3p²"},
+{n:15,s:"P",nm:"Phosphorus",w:"30.97376",c:15,r:3,g:"nonmetal",ox:"−3,+3,+5",elec:"[Ne] 3s² 3p³"},
+{n:16,s:"S",nm:"Sulfur",w:"32.07",c:16,r:3,g:"nonmetal",ox:"−2,+4,+6",elec:"[Ne] 3s² 3p⁴"},
+{n:17,s:"Cl",nm:"Chlorine",w:"35.45",c:17,r:3,g:"halogen",ox:"+7, +5, +1",elec:"[Ne] 3s² 3p⁵"},
+{n:18,s:"Ar",nm:"Argon",w:"39.9",c:18,r:3,g:"noble",ox:"0",elec:"[Ne] 3s² 3p⁶"},
+{n:19,s:"K",nm:"Potassium",w:"39.0983",c:1,r:4,g:"alkali",ox:"+1",elec:"[Ar] 4s¹"},
+{n:20,s:"Ca",nm:"Calcium",w:"40.08",c:2,r:4,g:"alkaline",ox:"+2",elec:"[Ar] 4s²"},
+{n:21,s:"Sc",nm:"Scandium",w:"44.95591",c:3,r:4,g:"transition",ox:"+3",elec:"[Ar] 3d¹ 4s²"},
+{n:22,s:"Ti",nm:"Titanium",w:"47.867",c:4,r:4,g:"transition",ox:"+2,+3,+4",elec:"[Ar] 3d² 4s²"},
+{n:23,s:"V",nm:"Vanadium",w:"50.9415",c:5,r:4,g:"transition",ox:"+5,+4,+3",elec:"[Ar] 3d³ 4s²"},
+{n:24,s:"Cr",nm:"Chromium",w:"51.996",c:6,r:4,g:"transition",ox:"+2,+3,+6",elec:"[Ar] 3d⁵ 4s¹"},
+{n:25,s:"Mn",nm:"Manganese",w:"54.93804",c:7,r:4,g:"transition",ox:"+7,+4,+3",elec:"[Ar] 3d⁵ 4s²"},
+{n:26,s:"Fe",nm:"Iron",w:"55.84",c:8,r:4,g:"transition",ox:"+2,+3",elec:"[Ar] 3d⁶ 4s²"},
+{n:27,s:"Co",nm:"Cobalt",w:"58.93193",c:9,r:4,g:"transition",ox:"+2,+3",elec:"[Ar] 3d⁷ 4s²"},
+{n:28,s:"Ni",nm:"Nickel",w:"58.693",c:10,r:4,g:"transition",ox:"+2,+3",elec:"[Ar] 3d⁸ 4s²"},
+{n:29,s:"Cu",nm:"Copper",w:"63.55",c:11,r:4,g:"transition",ox:"+1,+2",elec:"[Ar] 3d¹⁰ 4s¹"},
+{n:30,s:"Zn",nm:"Zinc",w:"65.4",c:12,r:4,g:"transition",ox:"+2",elec:"[Ar] 3d¹⁰ 4s²"},
+{n:31,s:"Ga",nm:"Gallium",w:"69.723",c:13,r:4,g:"post-transition",ox:"+3",elec:"[Ar] 3d¹⁰ 4s² 4p¹"},
+{n:32,s:"Ge",nm:"Germanium",w:"72.63",c:14,r:4,g:"metalloid",ox:"+2,+4",elec:"[Ar] 3d¹⁰ 4s² 4p²"},
+{n:33,s:"As",nm:"Arsenic",w:"74.92159",c:15,r:4,g:"metalloid",ox:"−3,+3,+5",elec:"[Ar] 3d¹⁰ 4s² 4p³"},
+{n:34,s:"Se",nm:"Selenium",w:"78.97",c:16,r:4,g:"nonmetal",ox:"−2,+4,+6",elec:"[Ar] 3d¹⁰ 4s² 4p⁴"},
+{n:35,s:"Br",nm:"Bromine",w:"79.9",c:17,r:4,g:"halogen",ox:"+5,+1,-1",elec:"[Ar] 3d¹⁰ 4s² 4p⁵"},
+{n:36,s:"Kr",nm:"Krypton",w:"83.8",c:18,r:4,g:"noble",ox:"0",elec:"[Ar] 3d¹⁰ 4s² 4p⁶"},
+{n:37,s:"Rb",nm:"Rubidium",w:"85.468",c:1,r:5,g:"alkali",ox:"+1",elec:"[Kr] 5s¹"},
+{n:38,s:"Sr",nm:"Strontium",w:"87.62",c:2,r:5,g:"alkaline",ox:"+2",elec:"[Kr] 5s²"},
+{n:39,s:"Y",nm:"Yttrium",w:"88.90584",c:3,r:5,g:"transition",ox:"+3",elec:"[Kr] 4d¹ 5s²"},
+{n:40,s:"Zr",nm:"Zirconium",w:"91.22",c:4,r:5,g:"transition",ox:"+4",elec:"[Kr] 4d² 5s²"},
+{n:41,s:"Nb",nm:"Niobium",w:"92.90636",c:5,r:5,g:"transition",ox:"+5,+3",elec:"[Kr] 4d⁴ 5s¹"},
+{n:42,s:"Mo",nm:"Molybdenum",w:"95.95",c:6,r:5,g:"transition",ox:"+6",elec:"[Kr] 4d⁵ 5s¹"},
+{n:43,s:"Tc",nm:"Technetium",w:"96.90636",c:7,r:5,g:"transition",ox:"+7,+6,+4",elec:"[Kr] 4d⁵ 5s²"},
+{n:44,s:"Ru",nm:"Ruthenium",w:"101.1",c:8,r:5,g:"transition",ox:"+3",elec:"[Kr] 4d⁷ 5s¹"},
+{n:45,s:"Rh",nm:"Rhodium",w:"102.9055",c:9,r:5,g:"transition",ox:"+3",elec:"[Kr] 4d⁸ 5s¹"},
+{n:46,s:"Pd",nm:"Palladium",w:"106.42",c:10,r:5,g:"transition",ox:"+2,+3",elec:"[Kr] 4d¹⁰"},
+{n:47,s:"Ag",nm:"Silver",w:"107.868",c:11,r:5,g:"transition",ox:"+1",elec:"[Kr] 4d¹⁰ 5s¹"},
+{n:48,s:"Cd",nm:"Cadmium",w:"112.41",c:12,r:5,g:"transition",ox:"+2",elec:"[Kr] 4d¹⁰ 5s²"},
+{n:49,s:"In",nm:"Indium",w:"114.818",c:13,r:5,g:"post-transition",ox:"+3",elec:"[Kr] 4d¹⁰ 5s² 5p¹"},
+{n:50,s:"Sn",nm:"Tin",w:"118.71",c:14,r:5,g:"post-transition",ox:"+2,+4",elec:"[Kr] 4d¹⁰ 5s² 5p²"},
+{n:51,s:"Sb",nm:"Antimony",w:"121.76",c:15,r:5,g:"metalloid",ox:"−3,+3,+5",elec:"[Kr] 4d¹⁰ 5s² 5p³"},
+{n:52,s:"Te",nm:"Tellurium",w:"127.6",c:16,r:5,g:"metalloid",ox:"−2,+4,+6",elec:"[Kr] 4d¹⁰ 5s² 5p⁴"},
+{n:53,s:"I",nm:"Iodine",w:"126.9045",c:17,r:5,g:"halogen",ox:"+7,+5,+1",elec:"[Kr] 4d¹⁰ 5s² 5p⁵"},
+{n:54,s:"Xe",nm:"Xenon",w:"131.29",c:18,r:5,g:"noble",ox:"0",elec:"[Kr] 4d¹⁰ 5s² 5p⁶"},
+{n:55,s:"Cs",nm:"Cesium",w:"132.9055",c:1,r:6,g:"alkali",ox:"+1",elec:"[Xe] 6s¹"},
+{n:56,s:"Ba",nm:"Barium",w:"137.33",c:2,r:6,g:"alkaline",ox:"+2",elec:"[Xe] 6s²"},
+{n:57,s:"La",nm:"Lanthanum",w:"138.9055",c:3,r:8,g:"lanth",ox:"+3",elec:"[Xe] 5d¹ 6s²"},
+{n:58,s:"Ce",nm:"Cerium",w:"140.116",c:4,r:8,g:"lanth",ox:"+3,+4",elec:"[Xe] 4f¹ 5d¹ 6s²"},
+{n:59,s:"Pr",nm:"Praseodymium",w:"140.9128",c:5,r:8,g:"lanth",ox:"+3",elec:"[Xe] 4f³ 6s²"},
+{n:60,s:"Nd",nm:"Neodymium",w:"144.24",c:6,r:8,g:"lanth",ox:"+3",elec:"[Xe] 4f⁴ 6s²"},
+{n:61,s:"Pm",nm:"Promethium",w:"144.9128",c:7,r:8,g:"lanth",ox:"+3",elec:"[Xe] 4f⁵ 6s²"},
+{n:62,s:"Sm",nm:"Samarium",w:"150.4",c:8,r:8,g:"lanth",ox:"+2,+3",elec:"[Xe] 4f⁶ 6s²"},
+{n:63,s:"Eu",nm:"Europium",w:"151.964",c:9,r:8,g:"lanth",ox:"+2,+3",elec:"[Xe] 4f⁷ 6s²"},
+{n:64,s:"Gd",nm:"Gadolinium",w:"157.25",c:10,r:8,g:"lanth",ox:"+3",elec:"[Xe] 4f⁷ 5d¹ 6s²"},
+{n:65,s:"Tb",nm:"Terbium",w:"158.9254",c:11,r:8,g:"lanth",ox:"+3",elec:"[Xe] 4f⁹ 6s²"},
+{n:66,s:"Dy",nm:"Dysprosium",w:"162.5",c:12,r:8,g:"lanth",ox:"+3",elec:"[Xe] 4f¹⁰ 6s²"},
+{n:67,s:"Ho",nm:"Holmium",w:"164.9303",c:13,r:8,g:"lanth",ox:"+3",elec:"[Xe] 4f¹¹ 6s²"},
+{n:68,s:"Er",nm:"Erbium",w:"167.26",c:14,r:8,g:"lanth",ox:"+3",elec:"[Xe] 4f¹² 6s²"},
+{n:69,s:"Tm",nm:"Thulium",w:"168.9342",c:15,r:8,g:"lanth",ox:"+3",elec:"[Xe] 4f¹³ 6s²"},
+{n:70,s:"Yb",nm:"Ytterbium",w:"173.05",c:16,r:8,g:"lanth",ox:"+2,+3",elec:"[Xe] 4f¹⁴ 6s²"},
+{n:71,s:"Lu",nm:"Lutetium",w:"174.9667",c:17,r:8,g:"lanth",ox:"+3",elec:"[Xe] 4f¹⁴ 5d¹ 6s²"},
+{n:72,s:"Hf",nm:"Hafnium",w:"178.49",c:4,r:6,g:"transition",ox:"+4",elec:"[Xe] 4f¹⁴ 5d² 6s²"},
+{n:73,s:"Ta",nm:"Tantalum",w:"180.9479",c:5,r:6,g:"transition",ox:"+5",elec:"[Xe] 4f¹⁴ 5d³ 6s²"},
+{n:74,s:"W",nm:"Tungsten",w:"183.84",c:6,r:6,g:"transition",ox:"+6",elec:"[Xe] 4f¹⁴ 5d⁴ 6s²"},
+{n:75,s:"Re",nm:"Rhenium",w:"186.207",c:7,r:6,g:"transition",ox:"+7,+6,+4",elec:"[Xe] 4f¹⁴ 5d⁵ 6s²"},
+{n:76,s:"Os",nm:"Osmium",w:"190.2",c:8,r:6,g:"transition",ox:"+4,+3",elec:"[Xe] 4f¹⁴ 5d⁶ 6s²"},
+{n:77,s:"Ir",nm:"Iridium",w:"192.22",c:9,r:6,g:"transition",ox:"+3,+4",elec:"[Xe] 4f¹⁴ 5d⁷ 6s²"},
+{n:78,s:"Pt",nm:"Platinum",w:"195.08",c:10,r:6,g:"transition",ox:"+2,+4",elec:"[Xe] 4f¹⁴ 5d⁹ 6s¹"},
+{n:79,s:"Au",nm:"Gold",w:"196.9666",c:11,r:6,g:"transition",ox:"+1,+3",elec:"[Xe] 4f¹⁴ 5d¹⁰ 6s¹"},
+{n:80,s:"Hg",nm:"Mercury",w:"200.59",c:12,r:6,g:"transition",ox:"+2,+1",elec:"[Xe] 4f¹⁴ 5d¹⁰ 6s²"},
+{n:81,s:"Tl",nm:"Thallium",w:"204.383",c:13,r:6,g:"post-transition",ox:"+1,+3",elec:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p¹"},
+{n:82,s:"Pb",nm:"Lead",w:"207",c:14,r:6,g:"post-transition",ox:"+2,+4",elec:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p²"},
+{n:83,s:"Bi",nm:"Bismuth",w:"208.9804",c:15,r:6,g:"post-transition",ox:"+3,+5",elec:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p³"},
+{n:84,s:"Po",nm:"Polonium",w:"208.9824",c:16,r:6,g:"metalloid",ox:"+2,+4",elec:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁴"},
+{n:85,s:"At",nm:"Astatine",w:"209.9872",c:17,r:6,g:"halogen",ox:"−1,+1,+3,+5,+7",elec:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁵"},
+{n:86,s:"Rn",nm:"Radon",w:"222.0176",c:18,r:6,g:"noble",ox:"0",elec:"[Xe] 4f¹⁴ 5d¹⁰ 6s² 6p⁶"},
+{n:87,s:"Fr",nm:"Francium",w:"223.0197",c:1,r:7,g:"alkali",ox:"+1",elec:"[Rn] 7s¹"},
+{n:88,s:"Ra",nm:"Radium",w:"226.0254",c:2,r:7,g:"alkaline",ox:"+2",elec:"[Rn] 7s²"},
+{n:89,s:"Ac",nm:"Actinium",w:"227.0278",c:3,r:9,g:"actin",ox:"+3",elec:"[Rn] 6d¹ 7s²"},
+{n:90,s:"Th",nm:"Thorium",w:"232.038",c:4,r:9,g:"actin",ox:"+4",elec:"[Rn] 6d² 7s²"},
+{n:91,s:"Pa",nm:"Protactinium",w:"231.0359",c:5,r:9,g:"actin",ox:"+5,+4",elec:"[Rn] 5f² 6d¹ 7s²"},
+{n:92,s:"U",nm:"Uranium",w:"238.0289",c:6,r:9,g:"actin",ox:"+6,+5,+4,+3",elec:"[Rn] 5f³ 6d¹ 7s²"},
+{n:93,s:"Np",nm:"Neptunium",w:"237.0482",c:7,r:9,g:"actin",ox:"+6,+5,+4,+3",elec:"[Rn] 5f⁴ 6d¹ 7s²"},
+{n:94,s:"Pu",nm:"Plutonium",w:"244.0642",c:8,r:9,g:"actin",ox:"+6,+5,+4,+3",elec:"[Rn] 5f⁶ 7s²"},
+{n:95,s:"Am",nm:"Americium",w:"243.0614",c:9,r:9,g:"actin",ox:"+6,+5,+4,+3",elec:"[Rn] 5f⁷ 7s²"},
+{n:96,s:"Cm",nm:"Curium",w:"247.0704",c:10,r:9,g:"actin",ox:"+3",elec:"[Rn] 5f⁷ 6d¹ 7s²"},
+{n:97,s:"Bk",nm:"Berkelium",w:"247.0703",c:11,r:9,g:"actin",ox:"+3,+4",elec:"[Rn] 5f⁹ 7s²"},
+{n:98,s:"Cf",nm:"Californium",w:"251.0796",c:12,r:9,g:"actin",ox:"+3",elec:"[Rn] 5f¹⁰ 7s²"},
+{n:99,s:"Es",nm:"Einsteinium",w:"252.083",c:13,r:9,g:"actin",ox:"+3",elec:"[Rn] 5f¹¹ 7s²"},
+{n:100,s:"Fm",nm:"Fermium",w:"257.0951",c:14,r:9,g:"actin",ox:"+3",elec:"[Rn] 5f¹² 7s²"},
+{n:101,s:"Md",nm:"Mendelevium",w:"258.0984",c:15,r:9,g:"actin",ox:"+3,+2",elec:"[Rn] 5f¹³ 7s²"},
+{n:102,s:"No",nm:"Nobelium",w:"259.101",c:16,r:9,g:"actin",ox:"+2,+3",elec:"[Rn] 5f¹⁴ 7s²"},
+{n:103,s:"Lr",nm:"Lawrencium",w:"266.12",c:17,r:9,g:"actin",ox:"+3",elec:"[Rn] 5f¹⁴ 7s² 7p¹"},
+{n:104,s:"Rf",nm:"Rutherfordium",w:"267.122",c:4,r:7,g:"transition",ox:"+4",elec:"[Rn] 5f¹⁴ 6d² 7s²"},
+{n:105,s:"Db",nm:"Dubnium",w:"268.126",c:5,r:7,g:"transition",ox:"+5,+4,+3",elec:"[Rn] 5f¹⁴ 6d³ 7s²"},
+{n:106,s:"Sg",nm:"Seaborgium",w:"269.128",c:6,r:7,g:"transition",ox:"+6,+5,+4,+3,0",elec:"[Rn] 5f¹⁴ 6d⁴ 7s²"},
+{n:107,s:"Bh",nm:"Bohrium",w:"270.133",c:7,r:7,g:"transition",ox:"+7,+5,+4,+3",elec:"[Rn] 5f¹⁴ 6d⁵ 7s²"},
+{n:108,s:"Hs",nm:"Hassium",w:"269.1336",c:8,r:7,g:"transition",ox:"+8,+6,+5,+4,+3,+2",elec:"[Rn] 5f¹⁴ 6d⁶ 7s²"},
+{n:109,s:"Mt",nm:"Meitnerium",w:"277.154",c:9,r:7,g:"transition",ox:"+9,+8,+6,+3,+1",elec:"[Rn] 5f¹⁴ 6d⁷ 7s²"},
+{n:110,s:"Ds",nm:"Darmstadtium",w:"282.166",c:10,r:7,g:"transition",ox:"+8,+6,+4,+2,0",elec:"[Rn] 5f¹⁴ 6d⁸ 7s²"},
+{n:111,s:"Rg",nm:"Roentgenium",w:"282.169",c:11,r:7,g:"transition",ox:"+5,+3,+1,-1",elec:"[Rn] 5f¹⁴ 6d⁹ 7s²"},
+{n:112,s:"Cn",nm:"Copernicium",w:"286.179",c:12,r:7,g:"transition",ox:"+2,+1,0",elec:"[Rn] 5f¹⁴ 6d¹⁰ 7s²"},
+{n:113,s:"Nh",nm:"Nihonium",w:"286.182",c:13,r:7,g:"post-transition",ox:"-",elec:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p¹"},
+{n:114,s:"Fl",nm:"Flerovium",w:"290.192",c:14,r:7,g:"post-transition",ox:"+6,+4,+2,+1,0",elec:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p²"},
+{n:115,s:"Mc",nm:"Moscovium",w:"290.196",c:15,r:7,g:"post-transition",ox:"+3,+1",elec:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p³"},
+{n:116,s:"Lv",nm:"Livermorium",w:"293.205",c:16,r:7,g:"post-transition",ox:"-2,+2,+4",elec:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁴"},
+{n:117,s:"Ts",nm:"Tennessine",w:"294.211",c:17,r:7,g:"halogen",ox:"−1,+1,+3,+5",elec:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁵"},
+{n:118,s:"Og",nm:"Oganesson",w:"295.216",c:18,r:7,g:"noble",ox:"+6,+4,+2,+1,0,-1",elec:"[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁶"}
+];
+
+const modal = document.getElementById("modal");
+const modalBody = document.getElementById("modal-body");
+const t = document.getElementById("table");
+const empty=document.createElement("div");
+t.appendChild(empty);
+
+for(let g=1; g<=18; g++){
+  const h=document.createElement("div");
+  h.className="group-header";
+  h.textContent=g;
+  h.style.gridRow=1;
+  h.style.gridColumn=g+1;
+  t.appendChild(h);
+}
+
+for(let p=1; p<=7; p++){
+  const ph=document.createElement("div");
+  ph.className="period-header";
+  ph.textContent=p;
+  ph.style.gridRow=p+1;
+  ph.style.gridColumn=1;
+  t.appendChild(ph);
+}
+
+
+E.forEach(e=>{
+  const d=document.createElement("div");
+  d.className="el "+e.g;
+ d.style.gridColumn=e.c + 1; 
+d.style.gridRow=e.r + 1;    
+  d.innerHTML=`
+    <div class="no">${e.n}</div>
+    <div class="sym">${e.s}</div>
+    <div class="w">${e.w}</div>
+    <div class="name">${e.nm}</div>`;
+  d.onclick=()=>openModal(e);
+  t.appendChild(d);
+});
+
+function openModal(e){
+  const box = modal.querySelector(".modal-content");
+  box.className = "modal-content " + e.g;
+
+  const shells=[];
+  let electrons=e.n;
+  const maxShell=[2,8,18,32];
+
+  for(let m of maxShell){
+    if(electrons>0){
+      shells.push(Math.min(m,electrons));
+      electrons-=m;
+    }
+  }
+
+  let orbitsHTML="";
+  shells.forEach((count,i)=>{
+    const size=60+i*35;
+    let electronsHTML="";
+    for(let j=0;j<count;j++){
+      const angle=(360/count)*j;
+      electronsHTML+=`
+        <div class="electron" style="
+          transform:
+            translate(-50%,-50%)
+            rotate(${angle}deg)
+            translate(${size/2}px);
+        "></div>`;
+    }
+    orbitsHTML+=`
+      <div class="orbit" style="width:${size}px;height:${size}px">
+        ${electronsHTML}
+      </div>`;
+  });
+
+  modalBody.innerHTML=`
+    <h2>${e.s}</h2>
+    <div class="atom">
+      <div class="nucleus">${e.n}</div>
+      ${orbitsHTML}
+    </div>
+    <p><b>${e.nm}</b></p>
+    <hr>
+    <p><b>เลขอะตอม:</b> ${e.n}</p>
+    <p><b>คาบ :</b> ${e.r}</p>
+    <p><b>หมู่ :</b> ${e.c}</p>
+    <p><b>มวลอะตอม:</b> ${e.w}</p>
+    <p><b>เลขออกซิเดชัน:</b> ${e.ox}</p>
+    <p><b>การจัดเรียงอิเล็กตรอน:</b> ${e.elec}</p>
+  `;
+
+  modal.style.display="flex";
+}
+
+function closeModal(){
+  modal.style.display="none";
+}
+modal.onclick=e=>{
+  if(e.target===modal) closeModal();
+};
+
+
+function goQuiz(type) {
+  if (type === 1) {
+    window.location.href = "quiz.html?type=pre";
+  }
+  if (type === 2) {
+    window.location.href = "quiz.html?type=post";
+  }
+}
+function saveScore(name, type, score) {
+  fetch("https://script.google.com/macros/s/AKfycbyun42Idu747ru10Xdxh-fnterXn7J_S4VFWD8ReWSjzoHF6T65HoVrOQ1y-ofxhwuURA/exec", {
+    method: "POST",
+    body: JSON.stringify({
+      name: name,
+      type: type,
+      score: score
+    })
+  })
+  .then(res => console.log("บันทึกสำเร็จ"))
+  .catch(err => console.error("เกิดข้อผิดพลาด"));
+}
+
+</script>
+
+</body>
+</html>
